@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package log.v1;
+
+option java_package = "com.github.michaelzhao820.distributedlog.api.v1";
+option java_outer_classname = "LogProto";
+
+message Record {
+  bytes value = 1;
+  uint64 offset = 2;
+}
