@@ -1,5 +1,7 @@
 package com.github.michaelzhao820.distributedlog.internal.log;
 
+import lombok.Getter;
+
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -16,6 +18,7 @@ public class Store {
     private final File file;
     private final ReentrantLock lock;
     private final BufferedOutputStream buf;
+    @Getter
     private long size;
 
     public Store(File file) throws IOException {
@@ -104,6 +107,15 @@ public class Store {
         } finally {
             lock.unlock();
         }
+    }
+
+    public String name() {
+        return this.file.getAbsolutePath();
+    }
+
+    public InputStream inputStream() throws IOException {
+        buf.flush();
+        return new FileInputStream(this.file);
     }
 
     /**
