@@ -1,6 +1,7 @@
 package com.github.michaelzhao820.distributedlog.internal.log;
 
 import com.github.michaelzhao820.distributedlog.api.v1.LogProto;
+import com.github.michaelzhao820.distributedlog.internal.server.CommitLog;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 
-public class Log {
+public class Log implements CommitLog {
     private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
     private final String dir;
     private final Config config;
@@ -68,7 +69,7 @@ public class Log {
             newSegment(config.segment.initialOffset);
         }
     }
-
+    @Override
     public long append(LogProto.Record record) throws IOException {
         rwLock.writeLock().lock();
         try {
@@ -81,7 +82,7 @@ public class Log {
             rwLock.writeLock().unlock();
         }
     }
-
+    @Override
     public LogProto.Record read(long offset) throws IOException {
         rwLock.readLock().lock();
         try {
