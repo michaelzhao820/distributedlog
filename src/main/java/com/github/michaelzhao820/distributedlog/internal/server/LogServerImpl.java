@@ -8,10 +8,14 @@ import com.github.michaelzhao820.distributedlog.api.v1.LogProto.ConsumeResponse;
 import com.github.michaelzhao820.distributedlog.api.v1.LogProto.Record;
 
 import io.grpc.stub.StreamObserver;
+import io.grpc.Status;
 
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import java.io.IOException;
+
 
 public class LogServerImpl extends LogGrpc.LogImplBase {
 
@@ -51,9 +55,18 @@ public class LogServerImpl extends LogGrpc.LogImplBase {
             responseObserver.onNext(response);
             responseObserver.onCompleted();
             logger.fine("Consume successful for offset: " + request.getOffset());
-        } catch (Exception e) {
+        } catch (IOException e) {
             logger.log(Level.SEVERE, "Error while consuming record", e);
-            responseObserver.onError(e);
+            responseObserver.onError(Status.OUT_OF_RANGE
+                    .withDescription(e.getMessage())
+                    .withCause(e)
+                    .asRuntimeException());
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Unexpected error while consuming record", e);
+            responseObserver.onError(Status.UNKNOWN
+                    .withDescription(e.getMessage())
+                    .withCause(e)
+                    .asRuntimeException());
         }
     }
 
