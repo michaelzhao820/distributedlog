@@ -3,6 +3,7 @@ PROTO_SRC := $(PROTO_DIR)/api/v1
 JAVA_OUT_DIR := target/generated-sources/protobuf/java
 
 PROTOC := protoc
+GRPC_PLUGIN := $(HOME)/bin/protoc-gen-grpc-java
 
 PROTO_FILES := $(wildcard $(PROTO_SRC)/*.proto)
 
@@ -12,6 +13,7 @@ compile: $(PROTO_FILES)
 	@echo "Generating Java classes from .proto files..."
 	@mkdir -p $(JAVA_OUT_DIR)
 	$(PROTOC) --java_out=$(JAVA_OUT_DIR) -I=$(PROTO_DIR) $(PROTO_FILES)
+	$(PROTOC) --grpc-java_out=$(JAVA_OUT_DIR) -I=$(PROTO_DIR) --plugin=protoc-gen-grpc-java=$(GRPC_PLUGIN) $(PROTO_FILES)
 	@echo "Done!"
 
 clean:
